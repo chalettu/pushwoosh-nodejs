@@ -8,9 +8,9 @@ This is a node module I created to help consume Pushwoosh services in NodeJS
   npm install pushwoosh --save
 
 ## Usage
-
-  var pushwoosh = require('pushwoosh')
-     var pushClient= new pushWoosh("ApplicationId","APIToken");
+```javascript
+  var pushWoosh = require('pushwoosh');
+  var pushClient= new pushWoosh("ApplicationId","APIToken");
 
   var config={
   "send_date":"now",
@@ -27,6 +27,7 @@ pushClient.sendMessage(config).then(function(data){
 
 console.log(data.status_code);
 });
+```
 ## Tests
 
   Coming soon
