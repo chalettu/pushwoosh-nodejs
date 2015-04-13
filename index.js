@@ -50,7 +50,7 @@ function PushClient(appid, tkn, options) {
     var client=this;
     var deferred = Q.defer();
     var sendOptions=defaultConfig;
-    sendOptions.notifications.push(options);
+    sendOptions.notifications=[options];
 
     client.request(sendOptions,"createMessage").then(function(data){
       console.log(data);
