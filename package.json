@@ -1,6 +1,6 @@
 {
   "name": "pushwoosh",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "This is a node module I created to help consume Pushwoosh services in NodeJS",
   "main": "index.js",
   "scripts": {
