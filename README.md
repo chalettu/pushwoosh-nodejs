@@ -3,7 +3,7 @@ Pushwoosh
 
 This is a node module I created to help consume [Pushwoosh](https://pushwoosh.com) services in NodeJS.
 
-To read more about, see [pushWoosh documentation](https://docs.pushwoosh.com/platform-docs/).
+To read more about, see [Pushwoosh documentation](https://docs.pushwoosh.com/platform-docs/).
 
 ## Installation
 
