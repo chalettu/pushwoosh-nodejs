@@ -17,12 +17,13 @@ const axios = require("axios").create({
  @param {string} auth - The auth token, as seen in the Pushwoosh Dashboard
  */
 
-function PushClient(application, auth) {
+function PushClient(application, auth, options) {
   //Required client config
   if (!application || !auth) {
     throw "RestClient requires an APP ID and Auth Token set explicitly ";
   } else {
     //if auth token/SID passed in manually, trim spaces
+    this.options = options;
     this.application = application.replace(/ /g, "");
     this.auth = auth;
   }
@@ -62,6 +63,7 @@ PushClient.prototype.request = function(url, request, options = {}) {
   return axios.request({
     url,
     method: "post",
+    ...this.options,
     ...options,
     data: {
       request: { auth: this.auth, application: this.application, ...request }

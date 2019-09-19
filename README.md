@@ -1,36 +1,59 @@
 Pushwoosh
 ================
 
-This is a node module I created to help consume Pushwoosh services in NodeJS
+This is a node module I created to help consume Pushwoosh services in NodeJS.
+To read more about, see [pushWoosh documentation](https://docs.pushwoosh.com/platform-docs/).
 
 ## Installation
 
   npm install pushwoosh --save
 
-## Usage
-```javascript
-  var pushWoosh = require('pushwoosh');
-  var pushClient= new pushWoosh("ApplicationId","APIToken");
 
-  var config={
-  "send_date":"now",
-  "ignore_user_timezone": true,
-  "content":"test push message",
-  "data":{"custom":"this is a test"},
-  "platforms":[1,2,3,4,5,6,7,8,9,10,11],
-  "devices":[
+
+## Usage of createMessage
+```javascript
+const pushWoosh = require('pushwoosh');
+const pushClient = new pushWoosh("ApplicationId","APIToken");
+
+const notification = {
+  send_date:"now",
+  ignore_user_timezone: true,
+  content:"test push message",
+  data:{"custom":"this is a test"},
+  platforms:[1,2,3,4,5,6,7,8,9,10,11],
+  devices:[
     "deviceId"
   ]
 };
 
-pushClient.sendMessage(config).then(function(data){
-
-console.log(data.status_code);
+pushClient.createMessage(notification).then(({data})=>{
+  console.log(data);
 });
+// same as:
+// pushClient.request("/createMessage",{notifications:[notification]}).then(({data})=>{
+//   console.log(data);
+// });
 ```
+
+## Usage of deleteMessage
+```javascript
+const pushWoosh = require('pushwoosh');
+const pushClient = new pushWoosh("ApplicationId","APIToken");
+
+const messageId = 'MessageId'
+
+pushClient.deleteMessage(messageId).then(({data})=>{
+  console.log(data);
+});
+// same as:
+// pushClient.request("/deleteMessage",{message:messageId}).then(({data})=>{
+//   console.log(data);
+// });
+```
+
 ## Tests
 
-  Coming soon
+Coming soon
 
 ## Contributing
 
