@@ -4,140 +4,71 @@
  */
 
 //Dependencies
-var Q = require('q'),
-  https = require('https');
 
-//REST API Config Defaults
-var defaultHost = 'cp.pushwoosh.com',
-  defaultApiVersion = '1.3';
-var defaultConfig={
-  "application":"",
-  "auth":"",
-  "notifications":[]
-};
+const axios = require("axios").create({
+  baseURL: "https://cp.pushwoosh.com/json/1.3",
+  headers: { "Content-Type": "application/json" }
+});
 
 /**
  Pushwoosh API Client
  @constructor
- @param {string} appid - The application ID
- @param {string} tkn - The auth token, as seen in the Pushwoosh Dashboard
- @param {object} options (optional) - optional config for the REST client
+ @param {string} application - The application ID
+ @param {string} auth - The auth token, as seen in the Pushwoosh Dashboard
  */
 
-function PushClient(appid, tkn, options) {
+function PushClient(application, auth, options) {
   //Required client config
-  if (!appid || !tkn) {
-
-      throw 'RestClient requires an APP ID and Auth Token set explicitly ';
-  }
-  else {
+  if (!application || !auth) {
+    throw "RestClient requires an APP ID and Auth Token set explicitly ";
+  } else {
     //if auth token/SID passed in manually, trim spaces
-    this.appid = appid.replace(/ /g,'');
-    this.apiToken=tkn;
-
+    this.options = options;
+    this.application = application.replace(/ /g, "");
+    this.auth = auth;
   }
-
-  //Optional client config
-  options = options || {};
-  this.host = options.host || defaultHost;
-  this.apiVersion = options.apiVersion || defaultApiVersion;
-  this.timeout = options.timeout || 31000; // request timeout in milliseconds
-  defaultConfig.application=this.appid;
-  defaultConfig.auth=this.apiToken;
-
-  this.sendMessage=function(options){
-
-    var client=this;
-    var deferred = Q.defer();
-    var sendOptions=defaultConfig;
-    sendOptions.notifications = [];
-    sendOptions.notifications=[options];
-
-    client.request(sendOptions,"createMessage").then(function(data){
-      console.log(data);
-      deferred.resolve(data);
-
-    },function(err){console.log(err)});
-    return deferred.promise;
-  };
 }
+
+/**
+create a push notification
+
+ @param {object} notification - Message to Delete
+ */
+PushClient.prototype.createMessage = function(notification) {
+  return this.request("/createMessage", {
+    notifications: [notification]
+  });
+};
+
 /**
 Deletes a push notification
 
- @param {string} messageId - Message to Delete
+ @param {string} message - Message to Delete
  */
-PushClient.prototype.deleteMessage=function(messageId){
-
-  var client=this;
-  var deferred = Q.defer();
-  var sendOptions={'auth':client.apiToken,'message':messageId};
-console.log(sendOptions);
-  client.request(sendOptions,"deleteMessage").then(function(data){
-    console.log(data);
-    deferred.resolve(data);
-
-  },function(err){console.log(err)});
-  return deferred.promise;
+PushClient.prototype.deleteMessage = function(message) {
+  return this.request("/deleteMessage", {
+    message
+  });
 };
-
 
 /**
  Make an authenticated request against the Pushwoosh backend.
 
- @param {object} options - options for HTTP request
  @param {string} url - url to call
- - @param {object} error - an error object if there was a problem processing the request
- - @param {object} data - the JSON-parsed data
+ @param {object} request - options to include or override inside the data request
+ @param {object} options - options for HTTP request
  */
 
-PushClient.prototype.request = function (options, url) {
-  var client = this,
-    deferred = Q.defer();
-  var json_request={"request":options};
-
-  var error = null;
-
-  var jsonString = JSON.stringify(json_request);
-  var headers = {
-    'Content-Type': 'application/json',
-    'Content-Length': jsonString.length
-  };
-
-  var httpOptions = {
-    host: this.host,
-    path: '/json/' + this.apiVersion+'/'+url,
-    method: 'POST',
-    headers: headers
-  };
-
-  var req = https.request(httpOptions, function(res) {
-    res.setEncoding('utf-8');
-
-    var responseString = '';
-
-    res.on('data', function(data) {
-      responseString += data;
-    });
-
-    res.on('end', function() {
-   //   console.log(responseString);
-      var resultObject = JSON.parse(responseString);
-        deferred.resolve(resultObject);
-    });
-
-
+PushClient.prototype.request = function(url, request, options = {}) {
+  return axios.request({
+    url,
+    method: "post",
+    ...this.options,
+    ...options,
+    data: {
+      request: { auth: this.auth, application: this.application, ...request }
+    }
   });
-
-  req.on('error', function(e) {
-    // TODO: handle error.
-    console.log(e);
-    deferred.reject("error");
-  });
-  req.write(jsonString);
-  req.end();
-  return deferred.promise;
-
 };
 
 module.exports = PushClient;
-
